@@ -1,6 +1,6 @@
 FROM centos:latest
 
-MAINTAINER NewstarCorporation
+MAINTAINER NewstarCorporation1
 
 RUN yum install -y httpd
 
