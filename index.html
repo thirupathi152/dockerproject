@@ -1,9 +1,11 @@
-FROM centos:latest
+<!DOCTYPE html>
+<html>
+<body>
 
-MAINTAINER NewstarCorporation
+<p>cheking.......</p>
+<p style="color:red;">First container</p>
+<p style="color:blue;">using jenkins.......</p>
+<p style="font-size:50px;">Docker conatiner success</p>
 
-RUN yum install -y httpd
-
-COPY index.html /var/www/html/
-EXPOSE 80
-ENTRYPOINT ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+</body>
+</html>
