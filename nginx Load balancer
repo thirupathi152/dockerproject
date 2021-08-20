@@ -1,0 +1,66 @@
+compose file:
+version: '3'
+services:
+  proxy:
+  #  image: master-centos:latest
+    build:
+      context: /Users/semani/docker/apache_nginx/apache
+      dockerfile: apache
+    image: proxy
+    container_name: proxy
+    restart: always
+    ports:
+      - "8080:80"
+  webapp1:
+  #  image: master-centos:latest
+    build:
+      context: /Users/semani/docker/apache_nginx/nginx
+      dockerfile: nginx
+    image: webapp
+    container_name: webapp1
+    volumes:
+      - "./nginx/html:/var/www/html_tmp"
+    entrypoint: bash -c "cp -p /var/www/html_tmp/slave1.html /var/www/html/index.html && /etc/init.d/apache2 restart && top"
+    restart: always
+    ports:
+      - "9080:80"
+    stdin_open: true
+    tty: true
+  webapp2:
+  #  image: master-centos:latest
+    image: webapp
+    container_name: webapp2
+    volumes:
+      - "./nginx/html:/var/www/html_tmp"
+    entrypoint: bash -c "cp -p /var/www/html_tmp/slave2.html /var/www/html/index.html && /etc/init.d/apache2 restart && top"
+    restart: always
+    ports:
+      - "7080:80"
+    stdin_open: true
+    tty: true
+
+
+slave:
+FROM ubuntu
+RUN apt-get update \
+   && apt-get install -y vim apache2
+#COPY index.html /var/www/html/
+RUN mkdir -p /var/www/html_tmp
+#VOLUME /Users/semani/docker/apache_nginx/nginx/html:/var/www/html_tmp
+WORKDIR /var/www/html
+#CMD ["apachectl", "-D", "FOREGROUND"]
+EXPOSE 80
+
+
+
+Proxy:
+FROM ubuntu
+RUN apt-get update \
+   && apt-get install -y vim apache2
+COPY index.html /var/www/html/
+WORKDIR /var/www/html
+RUN a2enmod proxy && a2enmod proxy_http && a2enmod proxy_balancer && a2enmod lbmethod_byrequests
+RUN /etc/init.d/apache2 restart
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+CMD ["apachectl", "-D", "FOREGROUND"]
+EXPOSE 80
